@@ -2,23 +2,23 @@
     "kind": "List",
     "apiVersion": "v1",
     "metadata": {
-        "name": "s2i-oasp"
+        "name": "s2i-devonfw"
     },
     "items": [
         {
             "kind": "Template",
             "apiVersion": "v1",
             "metadata": {
-                "name": "oasp-devportal-angular-sample",
+                "name": "devonfw-devportal-angular-sample",
                 "annotations": {
                     "description": "Dev Portal sample application (angular/front-end)",
                     "iconClass": "icon-nodejs",
-                    "tags": "instant-app,oasp,javascript,angular"
+                    "tags": "instant-app,devonfw,javascript,angular"
                 }
             },
             "labels": {
                 "application": "devportal-angular",
-                "createdBy": "oasp-devportal-angular-template"
+                "createdBy": "devonfw-devportal-angular-template"
             },
             "parameters": [
                 {
@@ -105,8 +105,8 @@
                             "sourceStrategy": {
                                 "from": {
                                     "kind": "ImageStreamTag",
-                                    "namespace": "oasp",
-                                    "name": "s2i-oasp-angular:latest"
+                                    "namespace": "devonfw",
+                                    "name": "s2i-devonfw-angular:latest"
                                 },
                                 "env": [
                                     {
