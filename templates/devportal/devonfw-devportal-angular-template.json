@@ -105,8 +105,8 @@
                             "sourceStrategy": {
                                 "from": {
                                     "kind": "ImageStreamTag",
-                                    "namespace": "devonfw",
-                                    "name": "s2i-devonfw-angular:latest"
+                                    "namespace": "oasp",
+                                    "name": "s2i-oasp-angular:latest"
                                 },
                                 "env": [
                                     {
