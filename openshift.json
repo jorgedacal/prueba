@@ -6,5 +6,5 @@
     "APPLICATION_NAME": "helloworld-angular",
     "GIT_URI": "https://github.com/Jorge-Dacal/prueba",
     "GIT_REF": "master",
-    "CONTEXT_DIR": ""
+    "CONTEXT_DIR": "/"
 }
