@@ -4,7 +4,7 @@
     "DESCRIPTION": "Hello World reference application for DevonFW",
     "TYPE": "angular",
     "APPLICATION_NAME": "helloworld-angular",
-    "GIT_URI": "https://github.com/Jorge-Dacal/prueba",
+    "GIT_URI": "https://github.com/Jorge-Dacal/prueba.git",
     "GIT_REF": "master",
     "CONTEXT_DIR": "/"
 }
