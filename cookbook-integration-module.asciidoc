@@ -347,7 +347,7 @@ public class MySubscriberApp{
 }
 ----
 
-In this case we provide to the `subscribe` method a _Subscription Handler_ to manage what we want to do with each message. For the example we have implemented a basic message handler. To create your own _Subscription Handler_ you only need to create a class, annotate it with `@Handler` and implement the `SubscriptionHandler` interface. Lets see our _SubscriptionHandlerImp_
+In this case we provide to the `subscribe` method a _Subscription Handler_ to manage what we want to do with each message. For the example we have implemented a basic subscription handler. To create your own _Subscription Handler_ you only need to create a class, annotate it with `@Handler` and implement the `SubscriptionHandler` interface. Lets see our _SubscriptionHandlerImp_
 
 [source,java]
 ----
