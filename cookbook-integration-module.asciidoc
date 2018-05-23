@@ -477,21 +477,21 @@ public class MySecondApp{
   private Integration integration;
 
   @Inject
-  private RequestHandler simpleHandler;
+  private RequestHandler requestHandler;
 
   public void myMethod(){
 
-    this.integration.subscribeAndReply(this.simpleHandler);
+    this.integration.subscribeAndReply(this.requestHandler);
   }
 }
 ----
 
-In this case we provide to the `subscribeAndReply` method an _Integration Handler_ to manage the responses to each message. For the example we have implemented a basic Integration handler, to create your own one you only need to create a class and implement the `RequestHandler` interface. Lets see our _SimpleMessageHandler_
+In this case we provide to the `subscribeAndReply` method an _Request Handler_ to manage the responses to each message. For the example we have implemented a basic Request Handler, to create your own one you only need to create a class and implement the `RequestHandler` interface. Lets see our _RequestHandlerImp_
 
 [source,java]
 ----
 @Component
-public class SimpleIntegrationHandler implements RequestHandler {
+public class RequestHandlerImp implements RequestHandler {
 
   @Override
   public Object handleMessage(Message<?> m) {
@@ -625,21 +625,21 @@ public class MySecondApp{
   private Integration integration;
 
   @Inject
-  private RequestAsyncHandler longHandler;
+  private RequestAsyncHandler RequestAsyncHandler;
 
   public void myMethod(){
 
-    this.integration.subscribeAsync(this.longHandler);
+    this.integration.subscribeAsync(this.RequestAsyncHandler);
   }
 }
 ----
 
-In this case we provide to the `subscribeAsync` method an _Integration Handler_ to manage the responses to each message. For the example we have implemented a very simple Integration handler that blocks the process during 3 seconds to simulate a long process. To create your own _Integration Handler_ you only need to create a class, annotate it with `@Component` and implement the `RequestAsyncHandler` interface. Lets see our _LongIntegrationHandler_.
+In this case we provide to the `subscribeAsync` method an _Request Async Handler_ to manage the responses to each message. For the example we have implemented a very simple Request Async Handler that blocks the process during 3 seconds to simulate a long process. To create your own _Request Async Handler_ you only need to create a class, annotate it with `@Component` and implement the `RequestAsyncHandler` interface. Lets see our _RequestAsyncHandlerImp_.
 
 [source,java]
 ----
 @Component
-public class LongIntegrationHandler implements RequestAsyncHandler {
+public class RequestAsyncHandlerImp implements RequestAsyncHandler {
 
   @Override
   public Object handleMessage(Message<?> m) {
