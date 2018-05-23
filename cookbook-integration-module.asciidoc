@@ -347,7 +347,7 @@ public class MySubscriberApp{
 }
 ----
 
-In this case we provide to the `subscribe` method a _Subscription Handler_ to manage what we want to do with each message. For the example we have implemented a basic subscription handler. To create your own _Subscription Handler_ you only need to create a class, annotate it with `@Handler` and implement the `SubscriptionHandler` interface. Lets see our _SubscriptionHandlerImp_
+In this case we provide to the `subscribe` method a _Subscription Handler_ to manage what we want to do with each message. For the example we have implemented a basic subscription handler. To create your own _Subscription Handler_ you only need to create a class, annotate it with `@Component` and implement the `SubscriptionHandler` interface. Lets see our _SubscriptionHandlerImp_
 
 [source,java]
 ----
@@ -716,7 +716,7 @@ public class MySenderApp{
 }
 ----
 
-Then, in the _subscriber_ application, after adding the <<Adding the starter to a project,module dependency>> and the <<Injecting the module,injection>> of it, we only need to use the _subscribeTo_ method and provide the name for the channel and the queue (that *must match* the provided names in the first application) and the _Message Handler_ to manage the received messages. For more details about the _Message Handler_ check out the <<Subscriber application example ,subscriber application example>> section.
+Then, in the _subscriber_ application, after adding the <<Adding the starter to a project,module dependency>> and the <<Injecting the module,injection>> of it, we only need to use the _subscribeTo_ method and provide the name for the channel and the queue (that *must match* the provided names in the first application) and the _Subscription Handler_ to manage the received messages. For more details about the _Subscription Handler_ check out the <<Subscriber application example,subscriber application example>> section.
 
 [source,java]
 ----
@@ -728,11 +728,11 @@ public class MySubscriberApp{
   private Integration integration;
 
   @Inject 
-  private SubscriptionHandler messageHandler;
+  private SubscriptionHandler subscriptionHandler;
 
   public void readSimpleMessage(){
 
-    this.integration.subscribeTo("my-channel", "my-queue", this.messageHandler);
+    this.integration.subscribeTo("my-channel", "my-queue", this.subscriptionHandler);
   }
 }
 ----
@@ -741,12 +741,12 @@ By default, the interval for polling the channel is _5000_ (5 seconds) and can b
 
 [source,java]
 ----
-this.integration.subscribeTo("my-channel", "my-queue", this.messageHandler, 10000);
+this.integration.subscribeTo("my-channel", "my-queue", this.subscriptionHandler, 10000);
 ----
 
 ===== Creating and using a new request-reply channel
 
-In the app that is going to start the flow, after adding the <<Adding the starter to a project,module dependency>> and <<Injecting the module,injected it>>, you only need to call the _createRequestReplyChannel_ method and provide a _name_ for the channel, a _name_ for the related queue and, this part is slightly different from the rest of module implementation, you need to provide a _Message Handler_ that will manage the received response, as we do with subscriber applications.
+In the app that is going to start the flow, after adding the <<Adding the starter to a project,module dependency>> and <<Injecting the module,injected it>>, you only need to call the _createRequestReplyChannel_ method and provide a _name_ for the channel, a _name_ for the related queue and, this part is slightly different from the rest of module implementation, you need to provide a _Response Handler_ that will manage the received response, as we do with subscriber applications.
 
 [source,java]
 ----
@@ -769,7 +769,24 @@ public class MyFirstApp{
 }
 ----
 
-The _ResponseHandler_ provided in the example above is exactly the same than explained previously in this _Integration module_ chapter (<<Subscriber application example ,subscriber application example>>), except that, as this is a custom implementation, we don`t need to annotate the class with `@Handler`.
+The _ResponseHandler_ provided in the example above is similar than explained previously in this _Integration module_ chapter (<<Subscriber application example ,subscriber application example>>), except that it must be a `void` method.
+
+[source,java]
+----
+public class ResponseHandlerimp implements ResponseHandler {
+
+  @Override
+  public void handleMessage(Message<?> m) {
+
+    System.out.println("***********************************");
+    System.out.println("MESSAGE IS: " + m.getPayload());
+    System.out.println("***********************************");
+
+    m.getPayload().toString().concat(" World");
+  }
+
+}
+----
 
 With this code we will create the _channel/queue_ infrastructure, send the message and provide a handler for the response. Now we need to define the second side of the flow to receive the message and provide a reply.
 
@@ -782,7 +799,7 @@ You can also configure it when creating the channel passing the _timeout_ as a p
 IntegrationChannel myChannel = this.integration.createRequestReplyChannel("my-channel", "my-queue", this.responseHandler, 10000);
 ----
 
-In a second application, after adding the <<Adding the starter to a project,module dependency>> and the <<Injecting the module,injection>> of it, we only need to use the _subscribeAndReplyTo_ method and provide the name for the channel and the queue (that *must match* the names provided in the first app) and the _Integration Handler_ to manage the received messages. The implementation is the same as the one described in the <<Sender-Receiver application example,receiver application example>> section. So our sample code will look like
+In a second application, after adding the <<Adding the starter to a project,module dependency>> and the <<Injecting the module,injection>> of it, we only need to use the _subscribeAndReplyTo_ method and provide the name for the channel and the queue (that *must match* the names provided in the first app) and the _Request Handler_ to manage the received messages. The implementation is the same as the one described in the <<Sender-Receiver application example,receiver application example>> section. So our sample code will look like
 
 [source,java]
 ----
@@ -794,11 +811,11 @@ public class MySecondApp{
   private Integration integration;
 
   @Inject
-  private IntegrationHandler myIntegrationHandler;
+  private RequestHandler requestHandler;
 
   public void startCommunication(){
 
-    this.integration.subscribeAndReplyTo("my-channel", "my-queue", this.myIntegrationHandler);
+    this.integration.subscribeAndReplyTo("my-channel", "my-queue", this.requestHandler);
   }
 }
 ----
@@ -817,7 +834,7 @@ The first app will use the method _createAsyncRequestReplyChannel_ to create the
 [source,java]
 ----
 IntegrationChannel demoAsyncChannel = 
-    this.integration.createAsyncRequestReplyChannel("my-async-channel", "my-async-queue", this.myIntegrationHandler);
+    this.integration.createAsyncRequestReplyChannel("my-async-channel", "my-async-queue", this.responseHandler);
 ----
 
 You can define your own values for the _ThreadPoolExecutor's core pool size_ and _response timeout_ adding the properties `devonfw.integration.default.poolsize` and `devonfw.integration.default.receivetimeout` to your `application.properties` file and providing a value.
@@ -827,17 +844,30 @@ However, you can also define those values when creating the channel
 [source,java]
 ----
 IntegrationChannel demoAsyncChannel = 
-  this.integration.createAsyncRequestReplyChannel("my-async-channel", "my-async-queue", this.myMessageHandler, 15, 10000);
+  this.integration.createAsyncRequestReplyChannel("my-async-channel", "my-async-queue", this.responseHandler, 15, 10000);
 ----
 
-In the second app you can subscribe to the channel with the method _subscribeAndReplyAsyncTo_ and providing the names for the channel and queue (that *must match* with the names provided in the first application), and an _IntegrationHandler_ to manage the messages and provide a reply.
+In the second app you can subscribe to the channel with the method _subscribeAndReplyAsyncTo_ and providing the names for the channel and queue (that *must match* with the names provided in the first application), and an _Request Async Handler_ to manage the messages and provide a reply.
 
 [source,java]
 ----
-this.integration.subscribeAndReplyAsyncTo("my-async-channel", "my-async-queue", this.myIntegrationHandler);
+import com.capgemini.devonfw.module.integration.common.api.Integration;
+
+public class MySecondApp{
+  @Inject 
+  private Integration integration;
+
+  @Inject
+  private RequestAsyncHandler requestAsyncHandler;
+
+  public void startCommunication(){
+
+    this.integration.subscribeAndReplyAsyncTo("my-async-channel", "my-async-queue", this.RequestAsyncHandler);
+  }
+}
 ----
 
-The implementation for the _Integration Handler_ is explained <<Sender-Receiver application example,here>>.
+The implementation for the _Request Async Handler_ is explained <<Receiver-Sender async example,here>>.
 
 ==== Sending headers with the message
 
